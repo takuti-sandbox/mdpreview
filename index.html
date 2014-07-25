@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>Markdown Preview with MathJax</title>
+    <link href='style.css' rel='stylesheet' type='text/css' />
+  </head>
+
+  <body>
+    <div id="container" ng-app='mdpreview' ng-controller='mdpreviewController'>
+      <div id='html'></div>
+      <textarea id="md" ng-model='md' ng-change='convert()'></textarea>
+    </div>
+
+    <!-- load scripts -->
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular.min.js'></script>
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+    <script src='lib/markdown.js'></script>
+
+    <script type='text/x-mathjax-config'>
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script src='https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
+    <script>
+      $(function(){
+        var left = $("#html");
+        var right = $("#md");
+
+        right.scroll(function(){
+          left.scrollTop(right.scrollTop())
+        });
+      });
+
+      angular.module('mdpreview', [])
+        .controller('mdpreviewController', ['$scope', function($scope) {
+          if (localStorage.mdpreview) {
+            $scope.md = localStorage.mdpreview;
+            $('#html').html(markdown.toHTML($scope.md));
+          }
+
+          $scope.convert = function() {
+            $('#html').html(markdown.toHTML($scope.md));
+            localStorage.mdpreview = $scope.md;
+            MathJax.Hub.Queue(['Typeset',MathJax.Hub,'html']);
+          };
+        }]);
+    </script>
+
+  </body>
+</html>
